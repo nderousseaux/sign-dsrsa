@@ -1,4 +1,4 @@
-all:main clean
+all: main clean
 
 rsa.o: rsa.h rsa.c
 	gcc -c rsa.c
