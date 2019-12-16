@@ -1,6 +1,18 @@
-#include <stdio.h>
+
+#include "utils.h"
 
 int main(){
-	printf("Hello\n");
+	public_key pub_key;
+	
+	pub_key.n=2773;
+	pub_key.e=17;
+
+	private_key priv_key;
+	
+	priv_key.p=47;
+	priv_key.q=59;
+	priv_key.d=157;
+ 	
+	
 	return 0;
 }
