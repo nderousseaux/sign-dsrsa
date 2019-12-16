@@ -2,18 +2,24 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <unistd.h>
+#include <unistd.h>
 
-
+typedef
 struct private_key{
 	uint32_t p;
 	uint32_t q;
 	uint32_t d;
-};
+}
+private_key;
 
+typedef
 struct public_key{
 	uint32_t n;
 	uint32_t e;
-};
+}
+public_key;
+
 
 /* Fonction de déchiffrement d'un bloc de 32 bits
    Arguments:
@@ -21,40 +27,23 @@ struct public_key{
    		crypted_message: bloc de longueur 32 bits à déchiffrer
 */
 
-uint32_t decipher(struct private_key* pk, uint32_t crypted_message){
-	uint32_t p=pk->p;
-	uint32_t q=pk->q;
-	uint32_t d=pk->d;
-	uint32_t n=p*q;
-	uint32_t decryped_message=(crypted_message*d)%n;
-	return decryped_message;
-}
-
-//Chiffrement d'un message 
-void encryptionMessage(struct public_Key, const char *fileIn, char *fileOut){
-
-	int fd = open(fileIn, O_RDONLY);
-	char* buf[4];
-	int nb = read(fd, buf, 4);
-
-	while( nb >= 4){
-		encryptionBloc(public_Key, buf, fileOut);
-		int nb = read(fd, buf, 4);
+void decipher(private_key* pk, char* fileIn, char* fileOut){
+	int fdIn=open(fileIn,O_RDONLY);
+	int fdOut=open(fileOut,O_WRONLY);
+	char buf[4];
+	int n;
+	while((n=read(fdIn,buf,4))){
+		uint32_t decipheredBloc=decipherBloc(pk,buf);
+		write(fdOut,&decipheredBloc,n);
 	}
-	encryptionBloc(public_Key, nb, fileOut);
+	close(fdOut);
+	close(fdIn);
 }
 
-//Chiffrement d'un bloc du fichier qui est ensuite renvoyé dans le fichier de sortie
-void encryptionBloc(struct public_Key, uint8_t *partMessage, fileOut){
 
-	partMessage = puissanceModulo(partMessage, public_Key.e, public_Key.n);
-	write(fileOut, partMessage, 4);
-}
-
-//Calcul et retourne la puissance d'un valeur à un certain modulo
-int moduloPuissance(int val, int puissance, int modulo){
+uint32_t moduloPuissance(uint32_t val, uint32_t puissance, uint32_t modulo){
 	
-	int res = 1;
+	uint32_t res = 1;
 	for( int i = 1; i <= puissance; i++){
 		res = res * val;
 		while( res > modulo){
@@ -62,3 +51,38 @@ int moduloPuissance(int val, int puissance, int modulo){
 		}
 	}
 	return res;
+}
+
+/* Fonction de déchiffrement d'un bloc de 32 bits
+   Arguments:
+   		pk: pointeur sur la clef public, contenant les valeurs n, e
+   		partMessage: bloc de longueur 32 bits à déchiffrer
+*/
+
+uint32_t encryptionBloc(public_key* pk, uint32_t* partMessage){
+
+	uint32_t e = pk->e;
+	uint32_t n = pk->n;
+	return moduloPuissance(*partMessage, e, n);
+}
+
+/* Fonction de déchiffrement d'un fichier
+   Arguments:
+   		pk: pointeur sur la clef public, contenant les valeurs n, e
+   		*fileIn : fichier d'entrée à chiffré
+   		*fileOut : fichier sortie représentant le fichier chiffré
+*/
+
+void encryptionMessage(public_key* pk, const char *fileIn, char *fileOut){
+
+	int fdIn=open(fileIn,O_RDONLY);
+	int fdOut=open(fileOut,O_WRONLY);
+	uint32_t buf[4];
+	int nb;
+	while( (nb=read(fdIn,buf,4)) ){
+		uint32_t cipheredBloc = encryptionBloc(pk, buf);
+		write(fdOut,&cipheredBloc,nb);
+	}
+	close(fdOut);
+	close(fdOut);
+}
