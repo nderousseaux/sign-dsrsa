@@ -15,3 +15,4 @@ struct public_key{
 };
 
 uint32_t decipher(struct private_key* pk, uint32_t crypted_message);
+uint32_t toPower(uint32_t a, uint32_t b,uint32_t mod);

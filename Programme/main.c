@@ -15,7 +15,7 @@ int main(){
 
 	uint32_t message=920;
 	printf("%d\n",message );
-	uint32_t crypted_message=(pow(message,pub_key.e))%pub_key.n;
+	uint32_t crypted_message=toPower(message,pub_key.e,pub_key.n);
 	printf("%d\n",crypted_message );
 	uint32_t decrypted_message=decipher(&priv_key,crypted_message);
 	printf("%d\n",decrypted_message);
