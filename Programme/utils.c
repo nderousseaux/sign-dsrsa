@@ -30,7 +30,7 @@ uint32_t decipherBloc(private_key* pk, char* bloc){
 void decipher(private_key* pk, char* fileIn, char* fileOut){
 	int fdIn=open(fileIn,O_RDONLY);
 	int fdOut=open(fileOut,O_WRONLY);
-	char buf[4];
+	uint8_t buf[4];
 	int n;
 	while((n=read(fdIn,buf,4))){
 		uint32_t decipheredBloc=decipherBloc(pk,buf);
