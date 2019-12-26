@@ -9,5 +9,8 @@ utils.o: utils.h utils.c
 main: utils.o rsa.o main.c 
 	gcc -o main -Wall utils.o rsa.o main.c
 
+sha256: utils.o sha256.c
+    gcc -o sha256 -Wall utils.o sha256.c
+
 clean:
 	rm *.o
