@@ -4,51 +4,86 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <unistd.h>
-
-typedef
-struct private_key{
-	uint32_t p;
-	uint32_t q;
-	uint32_t d;
+#include <stdio.h>
+uint32_t getbitvalue1(uint32_t v, uint32_t idx)
+{
+    return (v >> idx) & 1;
 }
-private_key;
+void printbits_321(uint32_t v)
+{
+    for (uint32_t i = 32; i > 0; --i){
+        if(i%8 == 0){
+            printf(" ");
+        }
+        printf("%u", getbitvalue1(v, i-1));
 
-typedef
-struct public_key{
-	uint32_t n;
-	uint32_t e;
-}
-public_key;
-
-uint32_t toPower(uint32_t a, uint32_t b, uint32_t mod){
-	uint32_t res = a;
-	for(int i=1; i<b;i++){
-		res=res*a%mod;
-	}
-	return res;
-}
-
-/* Fonction de déchiffrement d'un bloc de 32 bits
-   Arguments:
-   		pk: pointeur sur la clef privée, contenant les valeurs p, q, et l'inverse modulaire d de e, mod n
-   		crypted_message: bloc de longueur 32 bits à déchiffrer
-*/
-
-void decipher(private_key* pk, char* fileIn, char* fileOut){
-    int fdIn=open(fileIn,O_RDONLY);
-    int fdOut=open(fileOut,O_WRONLY);
-    char buf[4];
-    int n;
-    while((n=read(fdIn,buf,4))){
-        uint32_t decipheredBloc=decipherBloc(pk,buf);
-        write(fdOut,&decipheredBloc,n);
     }
-    close(fdOut);
-    close(fdIn);
 }
 
-/* Fonction de déchiffrement d'un bloc de 32 bits
+
+struct rsaKey{
+    uint32_t n;
+    uint32_t e;
+    uint32_t d;
+};
+
+
+
+//TODO:Doc sur cette fonction
+uint32_t toPower(uint32_t a, uint32_t b, uint32_t mod){
+    uint32_t res = a;
+    for(int i=1; i<b;i++){
+        res=res*a%mod;
+    }
+    return res;
+}
+
+/** Fonction de chiffrement d'un bloc de 32 bits
    Arguments:
-   		pk: pointeur sur la clef public, contenant les valeurs n, e
+   		pk: pointeur sur la clef publique, contenant les valeurs n, e
+   		partMessage: bloc de longueur 32 bits à chiffrer
+*/
+uint32_t encryptionBloc(struct rsaKey* rk, uint32_t* partMessage){
+
+    uint32_t e = rk->e;
+    uint32_t n = rk->n;
+    printbits_321(partMessage);
+    printf("\n");
+    return toPower(*partMessage, e, n);
+}
+
+/** Fonction de chiffrement d'un message
+*   Arguments:
+*   		pk: pointeur sur la clef public, contenant les valeurs n, e
+*   		message : Tableau d'uint32_t à chiffrer.
+*   		tailleMessage : Nombre de case du tableau
+ *   		resultat : Message chiffré avec la clé publique
+*/
+void encryptionMessage(struct rsaKey* rk, uint32_t* message, int tailleMessage, uint32_t* resultat) {
+    for (int i = 0; i < tailleMessage; i++) {
+        resultat[i] = encryptionBloc(rk, &message[i]);
+    }
+}
+
+/** Fonction de déchiffrement d'un bloc de 32 bits
+   Arguments:
+   		pk: pointeur sur la clef privée, contenant les valeurs p, q et d
    		partMessage: bloc de longueur 32 bits à déchiffrer
 */
+uint32_t decipherBloc(struct rsaKey* rk, uint32_t* partMessage){
+    return toPower(*partMessage, rk->d, rk->n);
+}
+
+/** Fonction de dechiffrement d'un message
+*   Arguments:
+*   		pk: pointeur sur la clef privée, contenant les valeurs p, d et d
+*   		message : Tableau d'uint32_t à déchiffrer.
+*   		tailleMessage : Nombre de case du tableau
+ *   		resultat : Message déchiffré.
+*/
+void decipherMessage(struct rsaKey* rk, uint32_t* message, int tailleMessage, uint32_t* resultat){
+    for (int i = 0; i < tailleMessage; i++) {
+        resultat[i] = decipherBloc(rk, &message[i]);
+    }
+}
+
