@@ -9,6 +9,15 @@
 #include <unistd.h>
 #include "signature.h"
 
+off_t fsize(const char *filename) {
+    struct stat st;
+
+    if (stat(filename, &st) == 0)
+        return st.st_size;
+
+    return -1;
+}
+
 int main(int argc, char** argv) {
 
     if (argc != 4) {
@@ -16,21 +25,14 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    //On convertit le fichier en tableau de uint8_t
-    int fdIn=open(argv[1],O_RDONLY);
-    char buf[1];
-    int n;
-    int tailleFichier;
-    //On lit tout le fichier pour connaitre sa taille
-    while((n=read(fdIn,buf,1))){
-        tailleFichier = tailleFichier + 1;
-    }
-    close(fdIn);
+    uint32_t tailleFichier = fsize(argv[1]);
+
 
     uint8_t *tabFichier = malloc(sizeof(uint8_t)*tailleFichier);
 
-    fdIn=open(argv[1],O_RDONLY);
-    n=0;
+    int fdIn=open(argv[1],O_RDONLY);
+    int n=0;
+    char buf[1];
     int i;
     while((n=read(fdIn,buf,1))){
         tabFichier[i] = buf[0];
@@ -44,5 +46,12 @@ int main(int argc, char** argv) {
     struct rsaKey rk;
     rk.e = atoi(argv[3]);
     rk.n = atoi(argv[2]);
-    verificationSignature(tabFichier, tailleFichier, &rk);
+    char resultat = verificationSignature(tabFichier, tailleFichier, &rk);
+
+    if(resultat == 0){
+        printf("La signature n'est pas valide ! \n");
+    }
+    else{
+        printf("La signature est valide ! \n");
+    }
 }
