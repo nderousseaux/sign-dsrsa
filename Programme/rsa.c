@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <math.h>
+
 uint32_t getbitvalue1(uint32_t v, uint32_t idx)
 {
     return (v >> idx) & 1;
@@ -22,20 +24,21 @@ void printbits_321(uint32_t v)
 
 
 struct rsaKey{
-    uint32_t n;
-    uint32_t e;
-    uint32_t d;
+    uint64_t n;
+    uint64_t e;
+    uint64_t d;
 };
 
 
 
 //TODO:Doc sur cette fonction
 uint32_t toPower(uint32_t a, uint32_t b, uint32_t mod){
-    uint32_t res = a;
-    for(int i=1; i<b;i++){
-        res=res*a%mod;
+    uint64_t res=a;
+    for(int i=1; i<b; i++){
+        res = (res*a)%mod;
     }
-    return res;
+    return (uint32_t )res;
+
 }
 
 /** Fonction de chiffrement d'un bloc de 32 bits
@@ -43,13 +46,11 @@ uint32_t toPower(uint32_t a, uint32_t b, uint32_t mod){
    		pk: pointeur sur la clef publique, contenant les valeurs n, e
    		partMessage: bloc de longueur 32 bits à chiffrer
 */
-uint32_t encryptionBloc(struct rsaKey* rk, uint32_t* partMessage){
+uint32_t encryptionBloc(struct rsaKey* rk, uint32_t partMessage){
 
     uint32_t e = rk->e;
     uint32_t n = rk->n;
-    printbits_321(partMessage);
-    printf("\n");
-    return toPower(*partMessage, e, n);
+    return toPower(partMessage, e, n);
 }
 
 /** Fonction de chiffrement d'un message
@@ -61,7 +62,7 @@ uint32_t encryptionBloc(struct rsaKey* rk, uint32_t* partMessage){
 */
 void encryptionMessage(struct rsaKey* rk, uint32_t* message, int tailleMessage, uint32_t* resultat) {
     for (int i = 0; i < tailleMessage; i++) {
-        resultat[i] = encryptionBloc(rk, &message[i]);
+        resultat[i] = encryptionBloc(rk, message[i]);
     }
 }
 
@@ -70,8 +71,10 @@ void encryptionMessage(struct rsaKey* rk, uint32_t* message, int tailleMessage, 
    		pk: pointeur sur la clef privée, contenant les valeurs p, q et d
    		partMessage: bloc de longueur 32 bits à déchiffrer
 */
-uint32_t decipherBloc(struct rsaKey* rk, uint32_t* partMessage){
-    return toPower(*partMessage, rk->d, rk->n);
+uint32_t decipherBloc(struct rsaKey* rk, uint32_t partMessage){
+    uint32_t d = rk->d;
+    uint32_t n = rk->n;
+    return toPower(partMessage, d, n);
 }
 
 /** Fonction de dechiffrement d'un message
@@ -83,7 +86,7 @@ uint32_t decipherBloc(struct rsaKey* rk, uint32_t* partMessage){
 */
 void decipherMessage(struct rsaKey* rk, uint32_t* message, int tailleMessage, uint32_t* resultat){
     for (int i = 0; i < tailleMessage; i++) {
-        resultat[i] = decipherBloc(rk, &message[i]);
+        resultat[i] = decipherBloc(rk, message[i]);
     }
 }
 

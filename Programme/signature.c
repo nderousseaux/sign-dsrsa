@@ -57,37 +57,33 @@ char verificationSignature(uint8_t* entree,int tailleEntree, struct rsaKey* rk){
         }
     }
 
-    //On décrypte sha.
+
+
+
     //On convertit sha 8bit en sha32bit.
     uint32_t* sha32 = malloc(sizeof(uint32_t)*9);
     for(int i = 0; i<9; i++){
         sha32[i] =  (sha[(i*4)+0] << 24) + (sha[(i*4)+1] << 16) + (sha[(i*4)+2] << 8) + sha[(i*4)+3];
     }
-    for(int i = 0; i<9; i++){
-        printbits_32(sha32[i]);
-        printf("\n");
-    }
-    printf("\n");
+
+    //On le décrypte
     uint32_t* sha32Decrypt = malloc(sizeof(uint32_t)*9);
     encryptionMessage(rk, sha32, 9, sha32Decrypt);
 
-    //On calcule le sha du message, puis on le convertit en 9 blocs
+    //On calcule le sha du message
     uint32_t *hashTab = malloc(sizeof(uint32_t) * 8);
     sha256(message, tailleEntree-36, hashTab);
-    uint32_t *hashTab9 = malloc(sizeof(uint32_t) * 9);
-    changeFormat(hashTab, hashTab9);
 
-    for(int i = 0; i<9; i++){
-        printbits_32(sha32Decrypt[i]);
-        printf("\n");
+    //On compare
+    int i = 0;
+    char identique = 1;
+    while(i<8 && identique != 0){
+        if(sha32Decrypt[i]<<2 != hashTab[i]<<2){
+            identique = 0;
+        }
+        i = i +1;
     }
-    printf("\n ");
-    /*for(int i = 0; i<9; i++){
-        printbits_32(hashTab9[i]);
-        printf("\n");
-    }*/
-
-    return 0;
+    return identique;
 
 }
 

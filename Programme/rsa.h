@@ -5,9 +5,9 @@
 
 
 struct rsaKey{
-    uint32_t n;
-    uint32_t e;
-    uint32_t d;
+    uint64_t n;
+    uint64_t e;
+    uint64_t d;
 };
 
 uint32_t toPower(uint32_t a, uint32_t b,uint32_t mod);
