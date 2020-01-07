@@ -1,3 +1,4 @@
+#include "utils.h"
 #include "rsa.h"
 #include "sha256.h"
 
@@ -86,4 +87,3 @@ char verificationSignature(uint8_t* entree,int tailleEntree, struct rsaKey* rk){
     return identique;
 
 }
-
