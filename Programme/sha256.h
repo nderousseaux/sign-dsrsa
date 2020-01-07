@@ -24,15 +24,15 @@ static const uint32_t tableauK[64];
 
 //On définit les structures
 //Cette structure permettra de stocker les blocs de 512 bits sous forme d'un tableau de 16 blocs de 32 bits
-struct bloc512;
+struct bloc_512;
 
 
 
 //On définit les fonctions
-uint nbblocs(int size); //Nombre de bloc de 256 pour acceillir le message
-int bourrage(uint8_t* entree, int tailleEntree, uint8_t* sortie); //Bourage du message
-int decoupage(uint8_t* entree, int tailleEntree, struct bloc512* sortie); //Découpage du message en n mots de 512 bits
-void hash(struct bloc512* messageDecoupe, int nbBloc512, uint32_t* hashTab); //Hashage du message découpé
+uint nb_blocs(int size); //Nombre de bloc de 256 pour acceillir le message
+int bourrage(uint8_t* entree, int taille_entree, uint8_t* sortie); //Bourage du message
+int decoupage(uint8_t* entree, int taille_entree, struct bloc_512* sortie); //Découpage du message en n mots de 512 bits
+void hash(struct bloc_512* message_decoupe, int nb_bloc_512, uint32_t* hash_tab); //Hashage du message découpé
 void sha256(uint8_t* message, int taille, uint32_t* hashTab); //Fonction qui calcule le sha256 d'un message
-void printSha256(uint32_t* sha256); //Affiche le sha256 en hexadecimal
-void changeFormat(uint32_t* entree, uint32_t* sortie); //Modifie un sha256 sur 8 blocs, en un sha256 sur 9blocs
+void print_sha256(uint32_t* sha256); //Affiche le sha256 en hexadecimal
+void change_format(uint32_t* entree, uint32_t* sortie); //Modifie un sha256 sur 8 blocs, en un sha256 sur 9blocs

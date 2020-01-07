@@ -9,10 +9,10 @@
 #include <unistd.h>
 #include "signature.h"
 
-off_t fsize(const char *filename) {
+off_t fsize(const char *file_name) {
     struct stat st;
 
-    if (stat(filename, &st) == 0)
+    if (stat(file_name, &st) == 0)
         return st.st_size;
 
     return -1;
@@ -25,28 +25,28 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
 
-    uint32_t tailleFichier = fsize(argv[1]);
+    uint32_t taille_fichier = fsize(argv[1]);
 
 
-    uint8_t *tabFichier = malloc(sizeof(uint8_t)*tailleFichier);
+    uint8_t *tab_fichier = malloc(sizeof(uint8_t)*taille_fichier);
 
-    int fdIn=open(argv[1],O_RDONLY);
+    int fd_in=open(argv[1],O_RDONLY);
     int n=0;
     char buf[1];
     int i;
-    while((n=read(fdIn,buf,1))){
-        tabFichier[i] = buf[0];
+    while((n=read(fd_in,buf,1))){
+        tab_fichier[i] = buf[0];
         i = i+1;
     }
 
-    close(fdIn);
+    close(fd_in);
 
 
     //On lance la vérification
-    struct rsaKey rk;
+    struct rsa_key rk;
     rk.e = atoi(argv[3]);
     rk.n = atoi(argv[2]);
-    char resultat = verificationSignature(tabFichier, tailleFichier, &rk);
+    char resultat = verification_signature(tab_fichier, taille_fichier, &rk);
 
     if(resultat == 0){
         printf("La signature n'est pas valide ! \n");
