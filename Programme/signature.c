@@ -10,49 +10,49 @@
    		sortie: Tableau d'uint 8, le message signé.
    		rk: Clé rsa pour signer le message
 */
-int signatureRsa(uint8_t* entree, int tailleEntree, uint8_t* sortie, struct rsaKey* rk){
+int signature_rsa(uint8_t* entree, int taille_entree, uint8_t* sortie, struct rsa_key* rk){
     //On crée la signature du message
-    uint32_t *hashTab = malloc(sizeof(uint32_t) * 8);
-    sha256(entree, tailleEntree, hashTab);
+    uint32_t *hash_tab = malloc(sizeof(uint32_t) * 8);
+    sha256(entree, taille_entree, hash_tab);
 
     //On convertit en 9 blocs
-    uint32_t *hashTab9Blocs = malloc(sizeof(uint32_t) * 9);
-    changeFormat(hashTab, hashTab9Blocs);
+    uint32_t *hash_tab_9Blocs = malloc(sizeof(uint32_t) * 9);
+    change_format(hash_tab, hash_tab_9Blocs);
 
     //On crypte le message
-    uint32_t *hashTab9Encrypt = malloc(sizeof(uint32_t) * 9);
-    decipherMessage(rk, hashTab9Blocs, 9, hashTab9Encrypt);
+    uint32_t *hash_tab_9Encrypt = malloc(sizeof(uint32_t) * 9);
+    decipher_message(rk, hash_tab_9Blocs, 9, hash_tab_9Encrypt);
 
     //Convertit le hash en uint8
-    uint8_t *hashEncrypt8bits = malloc(sizeof(uint8_t) * 9*4);
-    int taillehash8 = convert32to8(hashTab9Encrypt, 9, hashEncrypt8bits);
+    uint8_t *hash_encrypt_8bits = malloc(sizeof(uint8_t) * 9*4);
+    int taille_hash8 = convert_32_to_8(hash_tab_9Encrypt, 9, hash_encrypt_8bits);
 
     //On remplit la sortie
-    for(int i = 0; i<tailleEntree; i++){
+    for(int i = 0; i<taille_entree; i++){
         sortie[i] = entree[i];
     }
-    for(int i = 0; i<taillehash8; i++){
-        sortie[tailleEntree+i] = hashEncrypt8bits[i];
+    for(int i = 0; i<taille_hash8; i++){
+        sortie[taille_entree+i] = hash_encrypt_8bits[i];
     }
 
-    return tailleEntree + 36;
+    return taille_entree + 36;
 }
 /**Fonction qui renvoie 0 si le message est mal signé, 1 sinon.
  *      Arguments:
  *          entree:Tableau d'uint8, le message signé
- *          tailleEntree: Taille du tableau
+ *          taille_entree: Taille du tableau
  *          rk: Clé publique de l'expéditeur
  */
-char verificationSignature(uint8_t* entree,int tailleEntree, struct rsaKey* rk){
+char verification_signature(uint8_t* entree,int taille_entree, struct rsa_key* rk){
     //On sépare le message et le sha
-    uint8_t *message = malloc(sizeof(uint8_t)*(tailleEntree - 36));
+    uint8_t *message = malloc(sizeof(uint8_t)*(taille_entree - 36));
     uint8_t *sha = malloc(sizeof(uint8_t)*(36));
     int j = 0;
-    for(int i = 0; i<tailleEntree; i++){//On s'occupe du message
-        if(i<tailleEntree -36){
+    for(int i = 0; i<taille_entree; i++){//On s'occupe du message
+        if(i<taille_entree -36){
             message[i] = entree[i];
         }
-        if(i>= tailleEntree-36){
+        if(i>= taille_entree-36){
             sha[j] = entree[i];
             j = j+1;
         }
@@ -68,18 +68,18 @@ char verificationSignature(uint8_t* entree,int tailleEntree, struct rsaKey* rk){
     }
 
     //On le décrypte
-    uint32_t* sha32Decrypt = malloc(sizeof(uint32_t)*9);
-    encryptionMessage(rk, sha32, 9, sha32Decrypt);
+    uint32_t* sha32_decrypt = malloc(sizeof(uint32_t)*9);
+    encryption_message(rk, sha32, 9, sha32_decrypt);
 
     //On calcule le sha du message
-    uint32_t *hashTab = malloc(sizeof(uint32_t) * 8);
-    sha256(message, tailleEntree-36, hashTab);
+    uint32_t *hash_tab = malloc(sizeof(uint32_t) * 8);
+    sha256(message, taille_entree-36, hash_tab);
 
     //On compare
     int i = 0;
     char identique = 1;
     while(i<8 && identique != 0){
-        if(sha32Decrypt[i]<<2 != hashTab[i]<<2){
+        if(sha32_decrypt[i]<<2 != hash_tab[i]<<2){
             identique = 0;
         }
         i = i +1;

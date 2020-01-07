@@ -12,22 +12,22 @@ int main(int argc, char** argv) {
     }
 
     //On lance le sha
-    uint32_t *hashTab = malloc(sizeof(uint32_t) * 8);
-    sha256((uint8_t *) argv[1], strlen(argv[1]), hashTab);
+    uint32_t *hash_tab = malloc(sizeof(uint32_t) * 8);
+    sha256((uint8_t *) argv[1], strlen(argv[1]), hash_tab);
 
     //On affiche le sha
-    printSha256(hashTab);
+    print_sha256(hash_tab);
     for(int i = 0; i<8; i++){
-        printbits_32(hashTab[i]);
+        print_bits_32(hash_tab[i]);
         printf("\n");
     }
 
     printf("\n\n Sha convertit en 9 blocs :\n");
     //On convertit le sha en 9 blocs
-    uint32_t *hashTab9 = malloc(sizeof(uint32_t) * 9);
-    changeFormat(hashTab, hashTab9);
+    uint32_t *hash_tab9 = malloc(sizeof(uint32_t) * 9);
+    change_format(hash_tab, hash_tab9);
     for(int i = 0; i<9; i++){
-        printbits_32(hashTab9[i]);
+        print_bits_32(hash_tab9[i]);
         printf("\n");
     }
 }
