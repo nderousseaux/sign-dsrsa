@@ -1,7 +1,7 @@
 /**
  * Main de test pour la question 1 : sha256
  */
-
+#include "utils.h"
 #include "sha256.h"
 
 int main(int argc, char** argv) {

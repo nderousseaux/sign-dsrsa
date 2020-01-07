@@ -36,8 +36,3 @@ void hash(struct bloc512* messageDecoupe, int nbBloc512, uint32_t* hashTab); //H
 void sha256(uint8_t* message, int taille, uint32_t* hashTab); //Fonction qui calcule le sha256 d'un message
 void printSha256(uint32_t* sha256); //Affiche le sha256 en hexadecimal
 void changeFormat(uint32_t* entree, uint32_t* sortie); //Modifie un sha256 sur 8 blocs, en un sha256 sur 9blocs
-uint32_t getbitvalue(uint32_t v, uint32_t idx) ;//Renvoie la valeur d'un bit
-uint8_t getbitvalue8(uint8_t v, uint8_t idx);
-void printbits_32(uint32_t v); //Fonction pour afficher les blocs de 32bits
-void printbits_8(uint8_t v); //Fonction pour afficher les blocs de 8bits
-int convert32to8(uint32_t* entree, int taille, uint8_t* sortie); //Fonction qui convertit un tableau de uint32_t en tableau de uint8, renvoie la taille de la sortie
