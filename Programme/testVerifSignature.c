@@ -6,7 +6,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <unistd.h>
 #include "signature.h"
 
 off_t fsize(const char *filename) {

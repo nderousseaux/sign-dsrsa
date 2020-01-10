@@ -251,17 +251,31 @@ void printSha256(uint32_t* sha256){
  */
 void changeFormat(uint32_t* entree, uint32_t* sortie){
     for(int i = 0; i<8; i++){
-        sortie[i] = entree[i];
+
 
         //On remplit le 9ème bloc
         //On prend les bits de poids fort du mot
         uint32_t maskFort = 0b11000000000000000000000000000000;
         uint32_t bitFort = entree[i]&maskFort;
 
-        //Ensuite, on le décale plus ou moint en fonction de i.
-        for(int j=0; j<i; j++){
-            bitFort = bitFort>>2; //TODO: A vérifier
-        }
+        uint32_t mask = 0b00111111111111111111111111111111;
+        sortie[i] = entree[i]&mask;
+
+        //Ensuite, on le décale plus ou moins en fonction de i.
+        int j = 30-(i*2);
+        bitFort = bitFort >> j;
         sortie[8] = sortie[8] + bitFort;
     }
+}
+
+/**
+ * Fonction qui affiche un sha256 9 blocs
+ *      Arguments :
+ *          sha256: Tableau de 9 uint32_t, le hash à afficher.
+ */
+void printSha256_9(uint32_t* sha256){
+    for(int i = 0; i<9; i++){
+        printf("%x", sha256[i]);
+    }
+    printf("\n");
 }

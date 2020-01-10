@@ -36,3 +36,4 @@ void hash(struct bloc512* messageDecoupe, int nbBloc512, uint32_t* hashTab); //H
 void sha256(uint8_t* message, int taille, uint32_t* hashTab); //Fonction qui calcule le sha256 d'un message
 void printSha256(uint32_t* sha256); //Affiche le sha256 en hexadecimal
 void changeFormat(uint32_t* entree, uint32_t* sortie); //Modifie un sha256 sur 8 blocs, en un sha256 sur 9blocs
+void printSha256_9(uint32_t* sha256); //Affiche le sha256 en hexadecimal 9 blocs
