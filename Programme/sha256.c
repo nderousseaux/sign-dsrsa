@@ -48,7 +48,7 @@ static const uint32_t tableauK[64] = {
  * Cette structure permettra de stocker les blocs de 512 bits sous forme d'un tableau de 16 blocs de 32 bits.
  * Utile dans la fonction sha256.
  */
-struct bloc_512{
+struct bloc512{
     uint32_t mots[16];
 };
 
@@ -57,7 +57,7 @@ struct bloc_512{
  *      Arguments :
  *          size: Taille en octet
  */
-uint nb_blocs(int size){
+uint nbblocs(int size){
 
 
     //Le nombre de blocs est égal à 1 + tailleMessage/512 (division entière)
@@ -77,32 +77,32 @@ uint nb_blocs(int size){
  * Fonction qui prépare un message au hashage. Renvoie la taille du message preparé (multiple de 64).
  *      Arguments :
  *          entree: Tableau d'uint8_t, le message à préparer.
- *          taille_entree: Nombre de case du tableau.
+ *          tailleEntree: Nombre de case du tableau.
  *          sortie: Tableau d'uint8_t, le message préparé.
  */
-int bourrage(uint8_t* entree, int taille_entree, uint8_t* sortie){
+int bourrage(uint8_t* entree, int tailleEntree, uint8_t* sortie){
     //on obtient alors un message complété dont la longueur est supérieure de 512 bits au plus petit multiple de 512 bits supérieur à la longueur initiale du message.
 
     //On remplit le début de la table par le message
     int i;
-    for(i = 0; i < taille_entree; i++){
+    for(i = 0; i < tailleEntree; i++){
         sortie[i] = entree[i]; // On remplit le tab temp des bits du message
     }
     sortie[i] = 128; // On met un 1 après le message
 
-    taille_entree = taille_entree*8;
+    tailleEntree = tailleEntree*8;
 
     //On rajoute la taille du message à la fin de la table.
-    sortie[nb_blocs(taille_entree)-1] = taille_entree%256;//Dernier bloc
-    sortie[nb_blocs(taille_entree)-2] = (taille_entree-sortie[nb_blocs(taille_entree)-1])/256;
-    sortie[nb_blocs(taille_entree)-3] = (taille_entree-sortie[nb_blocs(taille_entree)-2])/256/256;
-    sortie[nb_blocs(taille_entree)-4] = (taille_entree-sortie[nb_blocs(taille_entree)-3])/256/256/256;
-    sortie[nb_blocs(taille_entree)-5] = (taille_entree-sortie[nb_blocs(taille_entree)-4])/256/256/256/256;
-    sortie[nb_blocs(taille_entree)-6] = (taille_entree-sortie[nb_blocs(taille_entree)-5])/256/256/256/256/256;
-    sortie[nb_blocs(taille_entree)-7] = (taille_entree-sortie[nb_blocs(taille_entree)-6])/256/256/256/256/256/256;
-    sortie[nb_blocs(taille_entree)-8] = (taille_entree-sortie[nb_blocs(taille_entree)-7])/256/256/256/256/256/256/256;
+    sortie[nbblocs(tailleEntree)-1] = tailleEntree%256;//Dernier bloc
+    sortie[nbblocs(tailleEntree)-2] = (tailleEntree-sortie[nbblocs(tailleEntree)-1])/256;
+    sortie[nbblocs(tailleEntree)-3] = (tailleEntree-sortie[nbblocs(tailleEntree)-2])/256/256;
+    sortie[nbblocs(tailleEntree)-4] = (tailleEntree-sortie[nbblocs(tailleEntree)-3])/256/256/256;
+    sortie[nbblocs(tailleEntree)-5] = (tailleEntree-sortie[nbblocs(tailleEntree)-4])/256/256/256/256;
+    sortie[nbblocs(tailleEntree)-6] = (tailleEntree-sortie[nbblocs(tailleEntree)-5])/256/256/256/256/256;
+    sortie[nbblocs(tailleEntree)-7] = (tailleEntree-sortie[nbblocs(tailleEntree)-6])/256/256/256/256/256/256;
+    sortie[nbblocs(tailleEntree)-8] = (tailleEntree-sortie[nbblocs(tailleEntree)-7])/256/256/256/256/256/256/256;
 
-    return nb_blocs(taille_entree);
+    return nbblocs(tailleEntree);
 }
 
 
@@ -110,45 +110,45 @@ int bourrage(uint8_t* entree, int taille_entree, uint8_t* sortie){
  * Découpage du message en n mots de 512 bits. Renvoie le nombre de mots
  *      Arguments :
  *          entree: Tableau d'uint8_t, le message à découper.
- *          taille_entree: Nombre de case du tableau.
- *          sortie: Tableau de bloc_512, le message découpé.
+ *          tailleEntree: Nombre de case du tableau.
+ *          sortie: Tableau de bloc512, le message découpé.
  */
-int decoupage(uint8_t* entree, int taille_entree, struct bloc_512* sortie){
+int decoupage(uint8_t* entree, int tailleEntree, struct bloc512* sortie){
 
-    int nb_bloc_512 = taille_entree/64;
+    int nbBloc512 = tailleEntree/64;
 
-    for(int i = 0; i<nb_bloc_512; i++){ //On parcourt les blocs de 512 bits
+    for(int i = 0; i<nbBloc512; i++){ //On parcourt les blocs de 512 bits
         for(int j = 0; j<64; j= j+4){ //On parcourt les 16 blocs de 32 bits.
             //On crée le bloc de 32 que l'on veut mettre
             uint32_t bloc = 0;
-            int index_bloc = i*64 + j;
-            bloc = entree[index_bloc];
+            int indexBloc = i*64 + j;
+            bloc = entree[indexBloc];
             bloc = bloc << 8;
-            index_bloc++;
-            bloc = bloc + entree[index_bloc];
+            indexBloc++;
+            bloc = bloc + entree[indexBloc];
             bloc = bloc << 8;
-            index_bloc++;
-            bloc = bloc + entree[index_bloc];
+            indexBloc++;
+            bloc = bloc + entree[indexBloc];
             bloc = bloc << 8;
-            index_bloc++;
-            bloc = bloc + entree[index_bloc];
+            indexBloc++;
+            bloc = bloc + entree[indexBloc];
             sortie[i].mots[j/4] = bloc;
         }
     }
 
-    return nb_bloc_512;
+    return nbBloc512;
 }
 
 /**
  * Hahshage du message découpé.
  *      Arguments :
- *          entree: Tableau de bloc_512, le message préparé, puis découpé.
- *          nbBloc_512: Nombre de case du tableau.
+ *          entree: Tableau de bloc512, le message préparé, puis découpé.
+ *          nbBloc512: Nombre de case du tableau.
  *          sortie: Tableau de 8 uint_t32, le message hashé.
  */
-void hash(struct bloc_512* message_decoupe, int nb_bloc_512, uint32_t* hash_tab){
+void hash(struct bloc512* messageDecoupe, int nbBloc512, uint32_t* hashTab){
     //On initialise les valeurs initiales
-    memcpy(hash_tab, &depart, 32);
+    memcpy(hashTab, &depart, 32);
     uint32_t w[64];
     uint32_t a;
     uint32_t b;
@@ -161,22 +161,22 @@ void hash(struct bloc_512* message_decoupe, int nb_bloc_512, uint32_t* hash_tab)
     uint32_t t1 = 0;
     uint32_t t2 = 0;
 
-    for(int i=0; i<nb_bloc_512; i++){
+    for(int i=0; i<nbBloc512; i++){
         //On met à jour les valeurs intermédiaires
-        a = hash_tab[0];
-        b = hash_tab[1];
-        c = hash_tab[2];
-        d = hash_tab[3];
-        e = hash_tab[4];
-        f = hash_tab[5];
-        g = hash_tab[6];
-        h = hash_tab[7];
+        a = hashTab[0];
+        b = hashTab[1];
+        c = hashTab[2];
+        d = hashTab[3];
+        e = hashTab[4];
+        f = hashTab[5];
+        g = hashTab[6];
+        h = hashTab[7];
 
         //On crée le sha256
         //Pour t allant de 0 à 63
         for(int t=0; t<64; t++){
             if(t<=15){
-                w[t] = message_decoupe[i].mots[t];
+                w[t] = messageDecoupe[i].mots[t];
             }
             else{
                 w[t] = s1(w[t-2]) + w[t-7] + s0(w[t-15]) + w[t-16];
@@ -194,14 +194,14 @@ void hash(struct bloc_512* message_decoupe, int nb_bloc_512, uint32_t* hash_tab)
             a = t1+t2;
         }
 
-        hash_tab[0] = a+hash_tab[0];
-        hash_tab[1] = b+hash_tab[1];
-        hash_tab[2] = c+hash_tab[2];
-        hash_tab[3] = d+hash_tab[3];
-        hash_tab[4] = e+hash_tab[4];
-        hash_tab[5] = f+hash_tab[5];
-        hash_tab[6] = g+hash_tab[6];
-        hash_tab[7] = h+hash_tab[7];
+        hashTab[0] = a+hashTab[0];
+        hashTab[1] = b+hashTab[1];
+        hashTab[2] = c+hashTab[2];
+        hashTab[3] = d+hashTab[3];
+        hashTab[4] = e+hashTab[4];
+        hashTab[5] = f+hashTab[5];
+        hashTab[6] = g+hashTab[6];
+        hashTab[7] = h+hashTab[7];
 
     }
 
@@ -214,19 +214,19 @@ void hash(struct bloc_512* message_decoupe, int nb_bloc_512, uint32_t* hash_tab)
  *          taille: Nombre de case du tableau.
  *          hashTab: Tableau de 8 uint32_t, le message hashé.
  */
-void sha256(uint8_t* message, int taille, uint32_t* hash_tab){
+void sha256(uint8_t* message, int taille, uint32_t* hashTab){
 
     //Dabord, on bourre le message
-    uint8_t* tab_bourre;
-    tab_bourre = calloc(64, nb_blocs(taille)); //On initilise un tableau de uint8 de la bonne taille
-    int taille_bourrage = bourrage(message, taille, tab_bourre);
+    uint8_t* tabBourre;
+    tabBourre = calloc(64, nbblocs(taille)); //On initilise un tableau de uint8 de la bonne taille
+    int tailleBourrage = bourrage(message, taille, tabBourre);
 
     //Le message est découpé en nblocs de 512 bits
-    struct bloc_512 message_decoupe[taille_bourrage/64];
-    int nb_bloc_512 = decoupage(tab_bourre, taille_bourrage, message_decoupe);
+    struct bloc512 messageDecoupe[tailleBourrage/64];
+    int nbBloc512 = decoupage(tabBourre, tailleBourrage, messageDecoupe);
 
     //On calcule le hash
-    hash(message_decoupe, nb_bloc_512, hash_tab);
+    hash(messageDecoupe, nbBloc512, hashTab);
 
 
 }
@@ -237,7 +237,7 @@ void sha256(uint8_t* message, int taille, uint32_t* hash_tab){
  *      Arguments :
  *          sha256: Tableau de 8 uint32_t, le hash à afficher.
  */
-void print_sha256(uint32_t* sha256){
+void printSha256(uint32_t* sha256){
     for(int i = 0; i<8; i++){
         printf("%x", sha256[i]);
     }
@@ -249,19 +249,33 @@ void print_sha256(uint32_t* sha256){
  *          entree: Tableau de 8 uint32_t, le hash à convertir.
  *          sortie: Tableau de 9 uint32_t, le hash convertit.
  */
-void change_format(uint32_t* entree, uint32_t* sortie){
+void changeFormat(uint32_t* entree, uint32_t* sortie){
     for(int i = 0; i<8; i++){
-        sortie[i] = entree[i];
+
 
         //On remplit le 9ème bloc
         //On prend les bits de poids fort du mot
-        uint32_t mask_fort = 0b11000000000000000000000000000000;
-        uint32_t bit_fort = entree[i]&mask_fort;
+        uint32_t maskFort = 0b11000000000000000000000000000000;
+        uint32_t bitFort = entree[i]&maskFort;
 
-        //Ensuite, on le décale plus ou moint en fonction de i.
-        for(int j=0; j<i; j++){
-            bit_fort = bit_fort>>2; //TODO: A vérifier
-        }
-        sortie[8] = sortie[8] + bit_fort;
+        uint32_t mask = 0b00111111111111111111111111111111;
+        sortie[i] = entree[i]&mask;
+
+        //Ensuite, on le décale plus ou moins en fonction de i.
+        int j = 30-(i*2);
+        bitFort = bitFort >> j;
+        sortie[8] = sortie[8] + bitFort;
     }
+}
+
+/**
+ * Fonction qui affiche un sha256 9 blocs
+ *      Arguments :
+ *          sha256: Tableau de 9 uint32_t, le hash à afficher.
+ */
+void printSha256_9(uint32_t* sha256){
+    for(int i = 0; i<9; i++){
+        printf("%x", sha256[i]);
+    }
+    printf("\n");
 }
